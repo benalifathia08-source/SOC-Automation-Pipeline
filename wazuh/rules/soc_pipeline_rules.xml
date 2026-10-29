@@ -1,0 +1,102 @@
+<!--
+  SOC automation pipeline (Project 3): rules for the pipeline's own actions. IDs 100700-100799.
+  The verification script on the agent (active-response/soc-verify-block.py) writes one JSON line to
+  active-responses.log; Wazuh's ar_log_json decoder parses it and rule 650 groups it.
+-->
+<group name="soc_pipeline,active_response,">
+
+  <rule id="100700" level="0">
+    <if_sid>650</if_sid>
+    <field name="soc.check">^block$</field>
+    <description>SOC pipeline: firewall block verification result</description>
+  </rule>
+
+  <rule id="100701" level="5">
+    <if_sid>100700</if_sid>
+    <field name="soc.status">^present$</field>
+    <description>SOC pipeline: block of $(soc.ip) verified in the firewall</description>
+    <mitre>
+      <id>T1110</id>
+    </mitre>
+  </rule>
+
+  <rule id="100702" level="10">
+    <if_sid>100700</if_sid>
+    <field name="soc.status">^missing$</field>
+    <description>SOC pipeline: block of $(soc.ip) NOT found in the firewall after it was requested</description>
+  </rule>
+
+  <rule id="100703" level="10">
+    <if_sid>100700</if_sid>
+    <field name="soc.status">^invalid$</field>
+    <description>SOC pipeline: block verification refused an invalid IP address</description>
+  </rule>
+
+  <!-- Playbook B: soc-disable-account on DC01 (active-response/windows/soc-disable-account.ps1) -->
+  <rule id="100710" level="0">
+    <if_sid>650</if_sid>
+    <field name="soc.check">^account$</field>
+    <description>SOC pipeline: account action result</description>
+  </rule>
+
+  <rule id="100711" level="6">
+    <if_sid>100710</if_sid>
+    <field name="soc.status">^disabled$</field>
+    <description>SOC pipeline: account $(soc.account) disabled and verified in Active Directory</description>
+    <mitre>
+      <id>T1098</id>
+    </mitre>
+  </rule>
+
+  <rule id="100712" level="10">
+    <if_sid>100710</if_sid>
+    <field name="soc.status">^still_enabled$</field>
+    <description>SOC pipeline: account $(soc.account) is still enabled after the disable request</description>
+  </rule>
+
+  <rule id="100713" level="8">
+    <if_sid>100710</if_sid>
+    <field name="soc.status">^refused$</field>
+    <description>SOC pipeline: disabling $(soc.account) refused on the domain controller: $(soc.reason)</description>
+  </rule>
+
+  <rule id="100714" level="8">
+    <if_sid>100710</if_sid>
+    <field name="soc.status">^invalid$|^not_found$|^error$</field>
+    <description>SOC pipeline: account action failed ($(soc.status))</description>
+  </rule>
+
+  <!-- The pipeline's own health: written by the n8n error workflow to /var/log/soc-pipeline/pipeline.jsonl
+       on the tools VM (a local file, so it works even when Telegram or DNS is down) -->
+  <rule id="100720" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="soc_pipeline.event">^workflow_failure$</field>
+    <description>SOC pipeline failure: workflow $(soc_pipeline.workflow) failed at $(soc_pipeline.node): $(soc_pipeline.message)</description>
+  </rule>
+
+  <!-- The decision log (intake: alert_line.js, response: decision_line.js), same file -->
+  <rule id="100721" level="3">
+    <decoded_as>json</decoded_as>
+    <field name="soc_pipeline.event">^alert_scored$</field>
+    <description>SOC pipeline: alert $(soc_pipeline.alert_id) (playbook $(soc_pipeline.playbook), $(soc_pipeline.target)) scored $(soc_pipeline.severity) $(soc_pipeline.score); approval offered: $(soc_pipeline.offered)</description>
+  </rule>
+
+  <rule id="100722" level="5">
+    <decoded_as>json</decoded_as>
+    <field name="soc_pipeline.event">^decision$</field>
+    <description>SOC pipeline decision for alert $(soc_pipeline.alert_id): $(soc_pipeline.outcome) ($(soc_pipeline.target), playbook $(soc_pipeline.playbook))</description>
+  </rule>
+
+  <rule id="100723" level="10">
+    <if_sid>100722</if_sid>
+    <field name="soc_pipeline.outcome">^failed$</field>
+    <description>SOC pipeline: approved action FAILED for alert $(soc_pipeline.alert_id) ($(soc_pipeline.target)): nothing was done</description>
+  </rule>
+
+  <rule id="100715" level="3">
+    <if_sid>100710</if_sid>
+    <field name="soc.status">^already_disabled$</field>
+    <description>SOC pipeline: account $(soc.account) was already disabled</description>
+  </rule>
+
+</group>

@@ -1,0 +1,22 @@
+# Secrets: API keys, bot token, n8n encryption key. They live only on the tools VM or in n8n's
+# credential store, never in git.
+.env
+*.env
+!*.env.example
+
+# n8n runtime data (database, encryption key, binary data)
+n8n_data/
+.n8n/
+
+# Raw workflow exports are checked for secrets before they are committed (scripts/check_export.py);
+# only the cleaned copies in n8n/workflows/ go into git.
+exports/
+
+# Replay runs and metric outputs that contain timestamps from a specific lab session
+runs/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/

@@ -1,0 +1,477 @@
+{
+  "id": "socWazuhIntake01",
+  "name": "SOC pipeline - Wazuh intake",
+  "nodes": [
+    {
+      "id": "5542a025-5aa2-4a8c-b452-b034b95be8e2",
+      "name": "Wazuh alert",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        200
+      ],
+      "webhookId": "bf44bcf3-c999-488f-888a-394e59903649",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wazuh-alert",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {
+          "ipWhitelist": "192.168.145.128"
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{cred:Wazuh webhook secret}}",
+          "name": "Wazuh webhook secret"
+        }
+      }
+    },
+    {
+      "id": "a99563a4-7286-4359-9cc2-16cec6951aad",
+      "name": "Validate and dedupe",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        200
+      ],
+      "parameters": {
+        "jsCode": "{{file:n8n/code/config.js}}\n{{file:n8n/code/iplib.js}}\n{{file:n8n/code/validate.js}}"
+      }
+    },
+    {
+      "id": "68691c0a-c95f-44bf-b5ca-f4d75a46d7d8",
+      "name": "Needs lookup?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        200
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5c5375b2-6c70-4d32-9190-100cfc12f701",
+              "leftValue": "={{ $json.lookup }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "a3cafa44-4e92-43b4-947d-4d1d2c6fec48",
+      "name": "AbuseIPDB",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        80
+      ],
+      "onError": "continueRegularOutput",
+      "parameters": {
+        "url": "https://api.abuseipdb.com/api/v2/check",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "ipAddress",
+              "value": "={{ $('Validate and dedupe').first().json.ip.value }}"
+            },
+            {
+              "name": "maxAgeInDays",
+              "value": "90"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 8000
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{cred:AbuseIPDB key}}",
+          "name": "AbuseIPDB key"
+        }
+      }
+    },
+    {
+      "id": "8a8408b5-56ce-47a7-bee0-d9e4369a8b80",
+      "name": "VirusTotal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        80
+      ],
+      "onError": "continueRegularOutput",
+      "parameters": {
+        "url": "=https://www.virustotal.com/api/v3/ip_addresses/{{ encodeURIComponent($('Validate and dedupe').first().json.ip.value) }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 8000
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{cred:VirusTotal key}}",
+          "name": "VirusTotal key"
+        }
+      }
+    },
+    {
+      "id": "f5030ad2-9299-4c35-9dd9-90f74914ef60",
+      "name": "OTX",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        80
+      ],
+      "onError": "continueRegularOutput",
+      "parameters": {
+        "url": "=https://otx.alienvault.com/api/v1/indicators/IPv4/{{ encodeURIComponent($('Validate and dedupe').first().json.ip.value) }}/general",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 8000
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{cred:OTX key}}",
+          "name": "OTX key"
+        }
+      }
+    },
+    {
+      "id": "55d759cb-057b-4c8d-85a1-37fd7d5840fb",
+      "name": "Collect intel",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        200
+      ],
+      "parameters": {
+        "jsCode": "{{file:n8n/code/config.js}}\n{{file:n8n/code/collect_intel.js}}"
+      }
+    },
+    {
+      "id": "f7a1f06b-f9c2-4a18-b3f0-86e6ba89557a",
+      "name": "Score",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1540,
+        200
+      ],
+      "parameters": {
+        "jsCode": "{{file:scoring/score.js}}\n\n// ---- wrapper ----\nreturn $input.all().map((item) => ({ json: { ...item.json, verdict: score(item.json) } }));\n"
+      }
+    },
+    {
+      "id": "e22ad5ca-7369-4230-9bb3-c428d44a3260",
+      "name": "Build message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        200
+      ],
+      "parameters": {
+        "jsCode": "{{file:n8n/code/message.js}}"
+      }
+    },
+    {
+      "id": "e35ee620-bfbf-47ee-bc1a-a58741c3e21a",
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1980,
+        200
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "{{TELEGRAM_CHAT_ID}}",
+        "text": "={{ $('Build message').first().json.text }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML",
+          "disable_notification": "={{ $('Build message').first().json.silent }}",
+          "disable_web_page_preview": true
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "{{cred:Telegram bot}}",
+          "name": "Telegram bot"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
+    },
+    {
+      "id": "0d0384e0-609f-408b-b21c-2746926d52d4",
+      "name": "Needs approval?",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2200,
+        200
+      ],
+      "parameters": {
+        "jsCode": "{{file:n8n/code/handoff.js}}"
+      }
+    },
+    {
+      "id": "41e062d9-fcad-4a6c-84b8-ad140064a12e",
+      "name": "Start response",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2420,
+        200
+      ],
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "socResponse00001",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      }
+    },
+    {
+      "id": "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d01",
+      "name": "Alert line",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1870,
+        360
+      ],
+      "parameters": {
+        "jsCode": "{{file:n8n/code/alert_line.js}}"
+      }
+    },
+    {
+      "id": "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d02",
+      "name": "Write alert line",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        2090,
+        360
+      ],
+      "parameters": {
+        "operation": "write",
+        "fileName": "/home/node/pipeline-log/pipeline.jsonl",
+        "dataPropertyName": "data",
+        "options": {
+          "append": true
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Wazuh alert": {
+      "main": [
+        [
+          {
+            "node": "Validate and dedupe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate and dedupe": {
+      "main": [
+        [
+          {
+            "node": "Needs lookup?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs lookup?": {
+      "main": [
+        [
+          {
+            "node": "AbuseIPDB",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Collect intel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AbuseIPDB": {
+      "main": [
+        [
+          {
+            "node": "VirusTotal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VirusTotal": {
+      "main": [
+        [
+          {
+            "node": "OTX",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OTX": {
+      "main": [
+        [
+          {
+            "node": "Collect intel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect intel": {
+      "main": [
+        [
+          {
+            "node": "Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score": {
+      "main": [
+        [
+          {
+            "node": "Build message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build message": {
+      "main": [
+        [
+          {
+            "node": "Alert line",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "Needs approval?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs approval?": {
+      "main": [
+        [
+          {
+            "node": "Start response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert line": {
+      "main": [
+        [
+          {
+            "node": "Write alert line",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write alert line": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "socErrors0000001"
+  },
+  "pinData": {},
+  "active": false
+}

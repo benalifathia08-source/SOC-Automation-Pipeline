@@ -1,0 +1,782 @@
+[
+  {
+    "name": "A1 known-bad IP: high on every source (invented numbers)",
+    "facts": {
+      "playbook": "A",
+      "playbook_name": "SSH brute force from the internet",
+      "alert": {
+        "id": "fixture",
+        "rule_id": "5712",
+        "rule_level": 10,
+        "description": "sshd: brute force trying to get access to the system. Non existent user.",
+        "timestamp": "2026-10-09T20:00:00.000+0000",
+        "mitre": [
+          "T1110"
+        ]
+      },
+      "agent": {
+        "id": "006",
+        "name": "tools",
+        "critical": false
+      },
+      "ip": {
+        "value": "203.0.113.10",
+        "valid": true,
+        "public": true,
+        "range": "public",
+        "allowlisted": false
+      },
+      "user": {
+        "name": "test1",
+        "valid": true,
+        "protected": false
+      },
+      "member": null,
+      "group": null,
+      "intel": {
+        "abuseipdb": {
+          "status": "ok",
+          "confidence": 100,
+          "reports": 850,
+          "reporters": 210,
+          "whitelisted": false,
+          "tor": false,
+          "usage": "Data Center/Web Hosting/Transit",
+          "isp": "fixture",
+          "country": "XX",
+          "last_reported": ""
+        },
+        "virustotal": {
+          "status": "ok",
+          "malicious": 12,
+          "suspicious": 2,
+          "harmless": 60,
+          "reputation": -25,
+          "owner": "fixture"
+        },
+        "otx": {
+          "status": "ok",
+          "pulses": 6
+        },
+        "cached": false,
+        "fetched_at": "2026-10-09T20:00:00Z"
+      },
+      "lookup": false
+    },
+    "expect": "high"
+  },
+  {
+    "name": "A2 somewhat suspicious IP: a few reports, 1 engine (invented numbers)",
+    "facts": {
+      "playbook": "A",
+      "playbook_name": "SSH brute force from the internet",
+      "alert": {
+        "id": "fixture",
+        "rule_id": "5712",
+        "rule_level": 10,
+        "description": "sshd: brute force trying to get access to the system. Non existent user.",
+        "timestamp": "2026-10-09T20:00:00.000+0000",
+        "mitre": [
+          "T1110"
+        ]
+      },
+      "agent": {
+        "id": "006",
+        "name": "tools",
+        "critical": false
+      },
+      "ip": {
+        "value": "203.0.113.11",
+        "valid": true,
+        "public": true,
+        "range": "public",
+        "allowlisted": false
+      },
+      "user": {
+        "name": "admin",
+        "valid": true,
+        "protected": false
+      },
+      "member": null,
+      "group": null,
+      "intel": {
+        "abuseipdb": {
+          "status": "ok",
+          "confidence": 35,
+          "reports": 4,
+          "reporters": 3,
+          "whitelisted": false,
+          "tor": false,
+          "usage": "Fixed Line ISP",
+          "isp": "fixture",
+          "country": "XX",
+          "last_reported": ""
+        },
+        "virustotal": {
+          "status": "ok",
+          "malicious": 1,
+          "suspicious": 0,
+          "harmless": 60,
+          "reputation": 0,
+          "owner": "fixture"
+        },
+        "otx": {
+          "status": "ok",
+          "pulses": 0
+        },
+        "cached": false,
+        "fetched_at": "2026-10-09T20:00:00Z"
+      },
+      "lookup": false
+    },
+    "expect": "medium"
+  },
+  {
+    "name": "A3 clean big service: whitelisted, but mentioned in some OTX pulses (invented numbers)",
+    "facts": {
+      "playbook": "A",
+      "playbook_name": "SSH brute force from the internet",
+      "alert": {
+        "id": "fixture",
+        "rule_id": "5712",
+        "rule_level": 10,
+        "description": "sshd: brute force trying to get access to the system. Non existent user.",
+        "timestamp": "2026-10-09T20:00:00.000+0000",
+        "mitre": [
+          "T1110"
+        ]
+      },
+      "agent": {
+        "id": "006",
+        "name": "tools",
+        "critical": false
+      },
+      "ip": {
+        "value": "203.0.113.12",
+        "valid": true,
+        "public": true,
+        "range": "public",
+        "allowlisted": true
+      },
+      "user": {
+        "name": "root",
+        "valid": true,
+        "protected": false
+      },
+      "member": null,
+      "group": null,
+      "intel": {
+        "abuseipdb": {
+          "status": "ok",
+          "confidence": 0,
+          "reports": 0,
+          "reporters": 0,
+          "whitelisted": true,
+          "tor": false,
+          "usage": "Content Delivery Network",
+          "isp": "fixture",
+          "country": "XX",
+          "last_reported": ""
+        },
+        "virustotal": {
+          "status": "ok",
+          "malicious": 0,
+          "suspicious": 0,
+          "harmless": 60,
+          "reputation": 20,
+          "owner": "fixture"
+        },
+        "otx": {
+          "status": "ok",
+          "pulses": 12
+        },
+        "cached": false,
+        "fetched_at": "2026-10-09T20:00:00Z"
+      },
+      "lookup": false
+    },
+    "expect": "low"
+  },
+  {
+    "name": "A4 private source IP (lab machine): nothing asked",
+    "facts": {
+      "playbook": "A",
+      "playbook_name": "SSH brute force from the internet",
+      "alert": {
+        "id": "fixture",
+        "rule_id": "5712",
+        "rule_level": 10,
+        "description": "sshd: brute force trying to get access to the system. Non existent user.",
+        "timestamp": "2026-10-09T20:00:00.000+0000",
+        "mitre": [
+          "T1110"
+        ]
+      },
+      "agent": {
+        "id": "006",
+        "name": "tools",
+        "critical": false
+      },
+      "ip": {
+        "value": "192.168.145.130",
+        "valid": true,
+        "public": false,
+        "range": "private",
+        "allowlisted": true
+      },
+      "user": {
+        "name": "admin",
+        "valid": true,
+        "protected": false
+      },
+      "member": null,
+      "group": null,
+      "intel": {
+        "abuseipdb": {
+          "status": "skipped"
+        },
+        "virustotal": {
+          "status": "skipped"
+        },
+        "otx": {
+          "status": "skipped"
+        },
+        "cached": false,
+        "fetched_at": "2026-10-09T20:00:00Z"
+      },
+      "lookup": false
+    },
+    "expect": "low"
+  },
+  {
+    "name": "A5 lookups failed: AbuseIPDB quota, VirusTotal timeout, OTX fine",
+    "facts": {
+      "playbook": "A",
+      "playbook_name": "SSH brute force from the internet",
+      "alert": {
+        "id": "fixture",
+        "rule_id": "5712",
+        "rule_level": 10,
+        "description": "sshd: brute force trying to get access to the system. Non existent user.",
+        "timestamp": "2026-10-09T20:00:00.000+0000",
+        "mitre": [
+          "T1110"
+        ]
+      },
+      "agent": {
+        "id": "006",
+        "name": "tools",
+        "critical": false
+      },
+      "ip": {
+        "value": "203.0.113.13",
+        "valid": true,
+        "public": true,
+        "range": "public",
+        "allowlisted": false
+      },
+      "user": null,
+      "member": null,
+      "group": null,
+      "intel": {
+        "abuseipdb": {
+          "status": "unavailable",
+          "detail": "HTTP 429: Too Many Requests"
+        },
+        "virustotal": {
+          "status": "unavailable",
+          "detail": "timeout of 8000ms exceeded"
+        },
+        "otx": {
+          "status": "ok",
+          "pulses": 0
+        },
+        "cached": false,
+        "fetched_at": "2026-10-09T20:00:00Z"
+      },
+      "lookup": false
+    },
+    "expect": "medium"
+  },
+  {
+    "name": "B1 privileged group changed on DC01 by a normal account",
+    "facts": {
+      "playbook": "B",
+      "playbook_name": "Privileged group changed by a non-approved account",
+      "alert": {
+        "id": "fixture",
+        "rule_id": "100505",
+        "rule_level": 14,
+        "description": "AD: privileged group Domain Admins modified by non-approved account j.smith",
+        "timestamp": "2026-10-09T20:00:00.000+0000",
+        "mitre": [
+          "T1098"
+        ]
+      },
+      "agent": {
+        "id": "003",
+        "name": "DC01",
+        "critical": true
+      },
+      "ip": null,
+      "user": {
+        "name": "j.smith",
+        "valid": true,
+        "protected": false
+      },
+      "member": "CN=temp.user,OU=Users,OU=FTOU7,DC=ftou7,DC=internal",
+      "group": "Domain Admins",
+      "intel": null,
+      "lookup": false
+    },
+    "expect": "critical"
+  },
+  {
+    "name": "B2 same change by a protected service account",
+    "facts": {
+      "playbook": "B",
+      "playbook_name": "Privileged group changed by a non-approved account",
+      "alert": {
+        "id": "fixture",
+        "rule_id": "100505",
+        "rule_level": 14,
+        "description": "AD: privileged group Backup Operators modified by non-approved account svc_backup",
+        "timestamp": "2026-10-09T20:00:00.000+0000",
+        "mitre": [
+          "T1098"
+        ]
+      },
+      "agent": {
+        "id": "003",
+        "name": "DC01",
+        "critical": true
+      },
+      "ip": null,
+      "user": {
+        "name": "svc_backup",
+        "valid": true,
+        "protected": true
+      },
+      "member": "CN=svc_backup,OU=Service,OU=FTOU7,DC=ftou7,DC=internal",
+      "group": "Backup Operators",
+      "intel": null,
+      "lookup": false
+    },
+    "expect": "critical"
+  },
+  {
+    "name": "N1 rule not mapped to a playbook",
+    "facts": {
+      "playbook": null,
+      "playbook_name": "Not mapped to a playbook (report only)",
+      "alert": {
+        "id": "fixture",
+        "rule_id": "5501",
+        "rule_level": 3,
+        "description": "PAM: Login session opened.",
+        "timestamp": "2026-10-09T20:00:00.000+0000",
+        "mitre": []
+      },
+      "agent": {
+        "id": "006",
+        "name": "tools",
+        "critical": false
+      },
+      "ip": null,
+      "user": null,
+      "member": null,
+      "group": null,
+      "intel": null,
+      "lookup": false
+    },
+    "expect": "low"
+  },
+  {
+    "name": "X1 boundary: AbuseIPDB exactly 75%, VirusTotal 0 (single source reaches high on purpose)",
+    "facts": {
+      "playbook": "A",
+      "playbook_name": "SSH brute force from the internet",
+      "alert": {
+        "id": "fixture",
+        "rule_id": "5712",
+        "rule_level": 10,
+        "description": "sshd: brute force trying to get access to the system. Non existent user.",
+        "timestamp": "2026-10-09T20:00:00.000+0000",
+        "mitre": [
+          "T1110"
+        ]
+      },
+      "agent": {
+        "id": "006",
+        "name": "tools",
+        "critical": false
+      },
+      "ip": {
+        "value": "203.0.113.10",
+        "valid": true,
+        "public": true,
+        "range": "public",
+        "allowlisted": false
+      },
+      "user": {
+        "name": "test1",
+        "valid": true,
+        "protected": false
+      },
+      "member": null,
+      "group": null,
+      "intel": {
+        "abuseipdb": {
+          "status": "ok",
+          "confidence": 75,
+          "reports": 850,
+          "reporters": 210,
+          "whitelisted": false,
+          "tor": false,
+          "usage": "Data Center/Web Hosting/Transit",
+          "isp": "fixture",
+          "country": "XX",
+          "last_reported": ""
+        },
+        "virustotal": {
+          "status": "ok",
+          "malicious": 0,
+          "suspicious": 2,
+          "harmless": 60,
+          "reputation": -25,
+          "owner": "fixture"
+        },
+        "otx": {
+          "status": "ok",
+          "pulses": 6
+        },
+        "cached": false,
+        "fetched_at": "2026-10-09T20:00:00Z"
+      },
+      "lookup": false
+    },
+    "expect": "high"
+  },
+  {
+    "name": "X2 boundary: AbuseIPDB 74%, VirusTotal 0",
+    "facts": {
+      "playbook": "A",
+      "playbook_name": "SSH brute force from the internet",
+      "alert": {
+        "id": "fixture",
+        "rule_id": "5712",
+        "rule_level": 10,
+        "description": "sshd: brute force trying to get access to the system. Non existent user.",
+        "timestamp": "2026-10-09T20:00:00.000+0000",
+        "mitre": [
+          "T1110"
+        ]
+      },
+      "agent": {
+        "id": "006",
+        "name": "tools",
+        "critical": false
+      },
+      "ip": {
+        "value": "203.0.113.10",
+        "valid": true,
+        "public": true,
+        "range": "public",
+        "allowlisted": false
+      },
+      "user": {
+        "name": "test1",
+        "valid": true,
+        "protected": false
+      },
+      "member": null,
+      "group": null,
+      "intel": {
+        "abuseipdb": {
+          "status": "ok",
+          "confidence": 74,
+          "reports": 850,
+          "reporters": 210,
+          "whitelisted": false,
+          "tor": false,
+          "usage": "Data Center/Web Hosting/Transit",
+          "isp": "fixture",
+          "country": "XX",
+          "last_reported": ""
+        },
+        "virustotal": {
+          "status": "ok",
+          "malicious": 0,
+          "suspicious": 2,
+          "harmless": 60,
+          "reputation": -25,
+          "owner": "fixture"
+        },
+        "otx": {
+          "status": "ok",
+          "pulses": 6
+        },
+        "cached": false,
+        "fetched_at": "2026-10-09T20:00:00Z"
+      },
+      "lookup": false
+    },
+    "expect": "medium"
+  },
+  {
+    "name": "X3 boundary: AbuseIPDB 24%, VirusTotal 0",
+    "facts": {
+      "playbook": "A",
+      "playbook_name": "SSH brute force from the internet",
+      "alert": {
+        "id": "fixture",
+        "rule_id": "5712",
+        "rule_level": 10,
+        "description": "sshd: brute force trying to get access to the system. Non existent user.",
+        "timestamp": "2026-10-09T20:00:00.000+0000",
+        "mitre": [
+          "T1110"
+        ]
+      },
+      "agent": {
+        "id": "006",
+        "name": "tools",
+        "critical": false
+      },
+      "ip": {
+        "value": "203.0.113.10",
+        "valid": true,
+        "public": true,
+        "range": "public",
+        "allowlisted": false
+      },
+      "user": {
+        "name": "test1",
+        "valid": true,
+        "protected": false
+      },
+      "member": null,
+      "group": null,
+      "intel": {
+        "abuseipdb": {
+          "status": "ok",
+          "confidence": 24,
+          "reports": 850,
+          "reporters": 210,
+          "whitelisted": false,
+          "tor": false,
+          "usage": "Data Center/Web Hosting/Transit",
+          "isp": "fixture",
+          "country": "XX",
+          "last_reported": ""
+        },
+        "virustotal": {
+          "status": "ok",
+          "malicious": 0,
+          "suspicious": 2,
+          "harmless": 60,
+          "reputation": -25,
+          "owner": "fixture"
+        },
+        "otx": {
+          "status": "ok",
+          "pulses": 6
+        },
+        "cached": false,
+        "fetched_at": "2026-10-09T20:00:00Z"
+      },
+      "lookup": false
+    },
+    "expect": "low"
+  },
+  {
+    "name": "X4 accepted limit: VirusTotal 5 malicious alone never reaches high",
+    "facts": {
+      "playbook": "A",
+      "playbook_name": "SSH brute force from the internet",
+      "alert": {
+        "id": "fixture",
+        "rule_id": "5712",
+        "rule_level": 10,
+        "description": "sshd: brute force trying to get access to the system. Non existent user.",
+        "timestamp": "2026-10-09T20:00:00.000+0000",
+        "mitre": [
+          "T1110"
+        ]
+      },
+      "agent": {
+        "id": "006",
+        "name": "tools",
+        "critical": false
+      },
+      "ip": {
+        "value": "203.0.113.10",
+        "valid": true,
+        "public": true,
+        "range": "public",
+        "allowlisted": false
+      },
+      "user": {
+        "name": "test1",
+        "valid": true,
+        "protected": false
+      },
+      "member": null,
+      "group": null,
+      "intel": {
+        "abuseipdb": {
+          "status": "ok",
+          "confidence": 0,
+          "reports": 850,
+          "reporters": 210,
+          "whitelisted": false,
+          "tor": false,
+          "usage": "Data Center/Web Hosting/Transit",
+          "isp": "fixture",
+          "country": "XX",
+          "last_reported": ""
+        },
+        "virustotal": {
+          "status": "ok",
+          "malicious": 5,
+          "suspicious": 2,
+          "harmless": 60,
+          "reputation": -25,
+          "owner": "fixture"
+        },
+        "otx": {
+          "status": "ok",
+          "pulses": 6
+        },
+        "cached": false,
+        "fetched_at": "2026-10-09T20:00:00Z"
+      },
+      "lookup": false
+    },
+    "expect": "medium"
+  },
+  {
+    "name": "X5 whitelisted service flagged by VirusTotal stays low",
+    "facts": {
+      "playbook": "A",
+      "playbook_name": "SSH brute force from the internet",
+      "alert": {
+        "id": "fixture",
+        "rule_id": "5712",
+        "rule_level": 10,
+        "description": "sshd: brute force trying to get access to the system. Non existent user.",
+        "timestamp": "2026-10-09T20:00:00.000+0000",
+        "mitre": [
+          "T1110"
+        ]
+      },
+      "agent": {
+        "id": "006",
+        "name": "tools",
+        "critical": false
+      },
+      "ip": {
+        "value": "203.0.113.10",
+        "valid": true,
+        "public": true,
+        "range": "public",
+        "allowlisted": false
+      },
+      "user": {
+        "name": "test1",
+        "valid": true,
+        "protected": false
+      },
+      "member": null,
+      "group": null,
+      "intel": {
+        "abuseipdb": {
+          "status": "ok",
+          "confidence": 0,
+          "reports": 850,
+          "reporters": 210,
+          "whitelisted": true,
+          "tor": false,
+          "usage": "Data Center/Web Hosting/Transit",
+          "isp": "fixture",
+          "country": "XX",
+          "last_reported": ""
+        },
+        "virustotal": {
+          "status": "ok",
+          "malicious": 5,
+          "suspicious": 2,
+          "harmless": 60,
+          "reputation": -25,
+          "owner": "fixture"
+        },
+        "otx": {
+          "status": "ok",
+          "pulses": 6
+        },
+        "cached": false,
+        "fetched_at": "2026-10-09T20:00:00Z"
+      },
+      "lookup": false
+    },
+    "expect": "low"
+  },
+  {
+    "name": "X6 accepted limit: known-bad IP during an AbuseIPDB outage is medium (no buttons)",
+    "facts": {
+      "playbook": "A",
+      "playbook_name": "SSH brute force from the internet",
+      "alert": {
+        "id": "fixture",
+        "rule_id": "5712",
+        "rule_level": 10,
+        "description": "sshd: brute force trying to get access to the system. Non existent user.",
+        "timestamp": "2026-10-09T20:00:00.000+0000",
+        "mitre": [
+          "T1110"
+        ]
+      },
+      "agent": {
+        "id": "006",
+        "name": "tools",
+        "critical": false
+      },
+      "ip": {
+        "value": "203.0.113.10",
+        "valid": true,
+        "public": true,
+        "range": "public",
+        "allowlisted": false
+      },
+      "user": {
+        "name": "test1",
+        "valid": true,
+        "protected": false
+      },
+      "member": null,
+      "group": null,
+      "intel": {
+        "abuseipdb": {
+          "status": "unavailable",
+          "detail": "HTTP 429: Too Many Requests"
+        },
+        "virustotal": {
+          "status": "ok",
+          "malicious": 12,
+          "suspicious": 2,
+          "harmless": 60,
+          "reputation": -25,
+          "owner": "fixture"
+        },
+        "otx": {
+          "status": "ok",
+          "pulses": 6
+        },
+        "cached": false,
+        "fetched_at": "2026-10-09T20:00:00Z"
+      },
+      "lookup": false
+    },
+    "expect": "medium"
+  }
+]

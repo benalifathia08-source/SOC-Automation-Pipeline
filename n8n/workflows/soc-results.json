@@ -1,0 +1,105 @@
+{
+  "id": "socResults000001",
+  "name": "SOC pipeline - results",
+  "nodes": [
+    {
+      "id": "b7e4c1d2-3f5a-4e6b-8c9d-0a1b2c3d4e51",
+      "name": "Wazuh result",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        200
+      ],
+      "webhookId": "c8f5d2e3-4a6b-4f7c-9d0e-1b2c3d4e5f62",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wazuh-ar-result",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {
+          "ipWhitelist": "192.168.145.128"
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{cred:Wazuh webhook secret}}",
+          "name": "Wazuh webhook secret"
+        }
+      }
+    },
+    {
+      "id": "d9a6e3f4-5b7c-4a8d-8e1f-2c3d4e5f6a73",
+      "name": "Result message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        200
+      ],
+      "parameters": {
+        "jsCode": "{{file:n8n/code/result_message.js}}"
+      }
+    },
+    {
+      "id": "eab7f4a5-6c8d-4b9e-9f2a-3d4e5f6a7b84",
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        440,
+        200
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "{{TELEGRAM_CHAT_ID}}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML",
+          "disable_web_page_preview": true
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "{{cred:Telegram bot}}",
+          "name": "Telegram bot"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
+    }
+  ],
+  "connections": {
+    "Wazuh result": {
+      "main": [
+        [
+          {
+            "node": "Result message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Result message": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "socErrors0000001"
+  },
+  "pinData": {},
+  "active": false
+}

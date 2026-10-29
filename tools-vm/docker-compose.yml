@@ -1,0 +1,54 @@
+# n8n for the SOC automation pipeline. Deployed to /opt/soc-pipeline on the tools VM by deploy_n8n.sh.
+# The only secret, N8N_ENCRYPTION_KEY, is generated on the VM into /opt/soc-pipeline/.env (root, 0600)
+# and never enters git. Every other secret (bot token, API keys) lives in n8n's encrypted credential store.
+services:
+  n8n:
+    # Pinned by tag and digest; upgrade on purpose, never by pulling "latest"
+    image: n8nio/n8n:2.42.6@sha256:526daa38b68e923cc00c5280d18b4da5d489f115a73bdbf3b8e452b184197a9a
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      # Bound to the lab IP only. Docker's published ports bypass ufw, so the bind address is the real
+      # limit: the VMware NAT network is reachable from the host and the lab VMs, not from outside.
+      - "192.168.145.20:5678:5678"
+    env_file: .env
+    environment:
+      - N8N_HOST=192.168.145.20
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - N8N_WEBHOOK_URL=http://192.168.145.20:5678/
+      - N8N_EDITOR_BASE_URL=http://192.168.145.20:5678/
+      # Plain HTTP inside the lab NAT network (see README, Known limits); production would put a TLS
+      # reverse proxy in front and keep secure cookies on.
+      - N8N_SECURE_COOKIE=false
+      - GENERIC_TIMEZONE=Africa/Tunis
+      - TZ=Africa/Tunis
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      # Code nodes and expressions cannot read environment variables (where the encryption key lives)
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=true
+      # File nodes may only touch the pipeline log folder (audit trail read by the Wazuh agent, M5)
+      - N8N_RESTRICT_FILE_ACCESS_TO=/home/node/pipeline-log
+      # Only n8n's built-in nodes: no community packages (supply-chain risk on a box that can disable accounts)
+      - N8N_COMMUNITY_PACKAGES_ENABLED=false
+      - N8N_UNVERIFIED_PACKAGES_ENABLED=false
+      # Code nodes run in the built-in JS task runner (internal mode, deprecated but fine for one user;
+      # the external runner needs a second container). Short timeout: our Code nodes only validate and score.
+      - N8N_RUNNERS_TASK_TIMEOUT=60
+      # Adopt the safer future limits for the compression node now (we never decompress anything)
+      - N8N_COMPRESSION_NODE_MAX_DECOMPRESSED_SIZE_BYTES=268435456
+      - N8N_COMPRESSION_NODE_MAX_ZIP_ENTRIES=1000
+      # Trust the Wazuh API's own certificate (wazuh/new_api_cert.sh) instead of ignoring TLS errors
+      - NODE_EXTRA_CA_CERTS=/certs/wazuh-api.crt
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_VERSION_NOTIFICATIONS_ENABLED=false
+      - N8N_PERSONALIZATION_ENABLED=false
+      # Keep 14 days of execution history (alert contents) and no more
+      - EXECUTIONS_DATA_PRUNE=true
+      - EXECUTIONS_DATA_MAX_AGE=336
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - /var/log/soc-pipeline:/home/node/pipeline-log
+      - /opt/soc-pipeline/certs:/certs:ro
+
+volumes:
+  n8n_data:
